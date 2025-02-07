@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>  // For close()
+#include <stdbool.h>
 
 int main() {
     int socketFD = socket(AF_INET, SOCK_STREAM, 0);
@@ -34,8 +35,17 @@ int main() {
 
     printf("Connection was successful\n");
 
-    char* message = "Hi, there! I am the client";
-    send(socketFD,message,strlen(message),0);
+    char* message = NULL;
+    size_t messageSize = 0;
+    while(true){
+        ssize_t charCount = getline(&message, &messageSize,stdin);
+        if(charCount > 0){
+            if(strcmp(message,"exit")==0) break;
+
+            ssize_t amountSent = send(socketFD,message,strlen(message),0);
+        }
+        
+    }
 
     char buffer[1024];
 

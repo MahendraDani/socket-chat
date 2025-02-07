@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 struct sockaddr_in* createIPv4Address(char *ip, int port) {
   struct sockaddr_in  *address = malloc(sizeof(struct sockaddr_in));
@@ -44,13 +45,20 @@ int main(){
   int clientAddressSize = sizeof(struct sockaddr_in);
   int clientSocketFD = accept(serverSocketFD,clientSocketFD,&clientAddressSize);
 
+  // while LOOP here
   char buffer[1024];
-  recv(clientSocketFD,buffer,1024,0);
-  
-  char* message = "Hi, there! I am the server";
-  send(clientSocketFD,message,strlen(message),0);
+  char* message = NULL;
+  size_t messageSize = 0;
+  while(true){
+    ssize_t amountReceived = recv(clientSocketFD,buffer,1024,0);
+    if(amountReceived > 0){
+      buffer[amountReceived] = 0;
+      printf("%s",buffer);
+    }
 
-  printf("Response was %s\n",buffer);
+    if(amountReceived == 0) break;
+  }
 
+  close(serverSocketFD);
   return 0;
 }
